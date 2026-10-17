@@ -1,24 +1,11 @@
-\# Pattern Detector - Synchronous Reset (Mealy FSM)
+# Pattern Detector - Synchronous Reset (Part A)
 
+This is the primary implementation of the `"001"` / `"110"` sequence detector[cite: 14]. It utilizes a highly optimized Mealy Finite State Machine to achieve zero-latency output upon sequence detection.
 
+## Architectural Highlights
+* **Mealy FSM Design:** The output is a function of both the current state and the current input, satisfying the requirement to assert `data_out` exactly when the 3rd bit arrives[cite: 14].
+* **State Minimization:** The machine is designed with only 5 essential states (`S_RESET`, `S_IDLE`, `S_0`, `S_00`, `S_1`, `S_11`), eliminating the need for brute-force shift registers and reducing hardware utilization.
+* **Synchronous Reset:** The system reset is entirely synchronous. To safely handle the specific assignment requirement (where `rst='1'` forces `data_out='1'`[cite: 14]), the FSM utilizes a dedicated `S_RESET` state. This prevents multiple driver conflicts and ensures clean, predictable hardware synthesis.
 
-This is the standard and most optimized implementation of the `"001"` / `"110"` sequence detector. It follows industry best practices for designing FSMs in VHDL.
-
-
-
-\## Architecture Features
-
-\* \*\*FSM Type:\*\* Mealy Machine (the output depends on the current state \*and\* the current inputs).
-
-\* \*\*States:\*\* Only 5 states were used (`S\_RESET`, `S\_IDLE`, `S\_0`, `S\_00`, `S\_1`, `S\_11`), avoiding the need for unnecessary shift registers.
-
-\* \*\*Synchronous Reset:\*\* The reset signal (`rst`) is fully synchronous with the rising edge of the clock (`clk`).
-
-\* \*\*Avoiding Multiple Drivers:\*\* The code is strictly separated into a `sequential process` (for the Flip-Flops) and a `combinational process` (for the next-state and output logic). The reset logic for the output was integrated via a dedicated state (`S\_RESET`), eliminating short-circuits (unknown 'X' states in simulation).
-
-
-
-\## Simulation
-
-The folder includes the testbench file (`Pattern\_Detector\_tb.vhd`) which feeds the circuit with the test sequence `0010111000110011101` as per the assignment specifications. The simulation output produces the exact desired results without timing violations.
-
+## Simulation
+The included testbench strictly follows the assignment's verification methodology. By applying the test sequence `data_in = 0010111000110011101`, the simulation yields the exact expected response (`data_out = 0010000100101010010`)[cite: 14].
